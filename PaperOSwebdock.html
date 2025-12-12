@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PaperOS — Web Dock</title>
+  <style>
+    :root{
+      --bg:#0b0b0f; --panel:#0f1720; --accent:#ffd43b; --muted:#98a0aa; --glass: rgba(255,255,255,0.04);
+      --card: #0e1116; --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:#e6eef6;background:linear-gradient(180deg,#05060a 0%, #08101a 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+
+    .paper{
+      width:980px; max-width:96vw; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:18px; padding:18px; box-shadow: 0 12px 40px rgba(2,6,23,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    header{display:flex;align-items:center;gap:14px}
+    .logo{height:48px;width:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#ffb84d);display:flex;align-items:center;justify-content:center;color:#08101a;font-weight:700;font-size:18px;box-shadow:0 6px 18px rgba(255,212,59,0.08)}
+    h1{margin:0;font-size:20px}
+    .sub{color:var(--muted);font-size:13px}
+
+    .controls{display:flex;gap:8px;margin-top:14px;margin-bottom:12px;align-items:center}
+    .btn{background:var(--panel);border:1px solid rgba(255,255,255,0.03);padding:10px 12px;border-radius:12px;color:#eaf3ff;cursor:pointer;display:inline-flex;gap:10px;align-items:center;transition:transform .12s ease, box-shadow .12s ease}
+    .btn:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(2,6,23,0.5)}
+    .btn svg{width:18px;height:18px;opacity:0.95}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),#ffb84d);color:#08101a;font-weight:700}
+
+    .dock{display:flex;gap:8px;flex-wrap:wrap}
+
+    .viewer{margin-top:12px;background:var(--card);border-radius:12px;padding:12px;border:1px solid rgba(255,255,255,0.02);height:560px;overflow:hidden;position:relative}
+
+    iframe{width:100%;height:100%;border:0;border-radius:8px;background:white}
+
+    .overlay{position:absolute;inset:12px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;background:linear-gradient(180deg, rgba(2,6,23,0.6), rgba(2,6,23,0.5));backdrop-filter: blur(6px);color:#dfefff;padding:18px;text-align:center}
+    .overlay.hidden{display:none}
+    .overlay h3{margin:0;font-size:18px}
+    .overlay p{margin:0;color:var(--muted);font-size:13px}
+
+    .tiny{font-size:12px;color:var(--muted)}
+
+    .row{display:flex;align-items:center;gap:10px}
+
+    .openext{margin-top:8px}
+    .openext a{color:var(--accent);text-decoration:none;font-weight:700}
+
+    footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+    .credits{color:var(--muted);font-size:12px}
+
+    @media (max-width:560px){.paper{padding:12px}.viewer{height:420px}}
+  </style>
+</head>
+<body>
+  <div class="paper">
+    <header>
+      <div class="logo">¶</div>
+      <div>
+        <h1>PaperOS</h1>
+        <div class="sub">Web Dock — open sites inside PaperOS</div>
+      </div>
+    </header>
+
+    <div class="controls">
+      <div class="dock">
+        <button class="btn" data-url="https://www.youtube.com" title="YouTube">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M10 15l5.19-3L10 9v6z"></path><path d="M21.8 8s-.2-1.4-.8-2c-.7-.8-1.5-.8-1.9-.9C16.4 4.7 12 4.7 12 4.7h0s-4.4 0-7.1.4c-.4 0-1.2.1-1.9.9-.6.6-.8 2-.8 2S2 9.8 2 11.6v.8c0 1.8.3 3.6.3 3.6s.2 1.4.8 2c.7.8 1.6.8 2 1 1.5.2 6.9.4 6.9.4s4.4 0 7.1-.4c.4 0 1.2-.1 1.9-.9.6-.6.8-2 .8-2s.3-1.8.3-3.6v-.8c0-1.8-.3-3.6-.3-3.6z"></path></svg>
+          YouTube
+        </button>
+
+        <button class="btn" data-url="https://www.google.com" title="Google">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M12 11v4h7c-.5 2.3-2.6 4-5 4-3 0-5.5-2.5-5.5-5.5S11 8 14 8c1 0 1.7.3 2.3.7l1.5-1.5C17 6 15.8 5.5 14 5.5 9.6 5.5 6 9.1 6 13.5S9.6 21.5 14 21.5c4 0 7-3 7-7.5 0-.5 0-.9-.1-1.5H12z"></path></svg>
+          Google
+        </button>
+
+        <button class="btn" data-url="https://slowroads.app" title="Slow Roads">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M3 12h18v2H3z"></path></svg>
+          SlowRoads
+        </button>
+
+        <button class="btn" data-url="https://neal.fun" title="neal.fun">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden><path d="M12 2L1 21h22L12 2z"></path></svg>
+          neal.fun
+        </button>
+
+      </div>
+
+      <div style="flex:1"></div>
+
+      <button class="btn" data-url="https://www.crazygames.com" title="CrazyGames">
+          <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"></circle></svg>
+          CrazyGames
+        </button>
+
+        $1">Open in new tab</button>
+    </div>
+
+    <div class="viewer" role="region" aria-label="Web viewer">
+      <iframe id="iframe" srcdoc="<div style='font-family:Inter,system-ui;color:#0b0b0f;padding:40px;text-align:center'><h2 style='margin-top:40px'>Welcome to PaperOS Web Dock</h2><p class='tiny' style='color:#223'>Click a button above to load a site here.</p></div>"></iframe>
+
+      <div class="overlay" id="overlay">
+        <h3 id="ovTitle">No site loaded</h3>
+        <p id="ovMsg">Click a button to open a site inside the PaperOS viewer.</p>
+        <div class="openext" id="openext" style="display:none">
+          <a id="openLink" href="#" target="_blank" rel="noopener">Open in a new tab</a>
+        </div>
+        <div class="tiny">If a site refuses to load it likely blocks embedding — use the open in new tab button.</div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="credits">Polished demo · PaperOS Web Dock</div>
+      <div class="tiny">Built for Paper OS — made with ❤️</div>
+    </footer>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll('.btn[data-url]');
+    const iframe = document.getElementById('iframe');
+    const overlay = document.getElementById('overlay');
+    const ovTitle = document.getElementById('ovTitle');
+    const ovMsg = document.getElementById('ovMsg');
+    const openNew = document.getElementById('openNew');
+    const openLink = document.getElementById('openLink');
+    const openext = document.getElementById('openext');
+
+    let currentURL = null;
+
+    function showOverlay(title, msg, showOpen){
+      ovTitle.textContent = title;
+      ovMsg.textContent = msg;
+      openext.style.display = showOpen ? 'block' : 'none';
+      overlay.classList.remove('hidden');
+    }
+    function hideOverlay(){ overlay.classList.add('hidden'); }
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        const url = btn.getAttribute('data-url');
+        currentURL = url;
+        // show loading message
+        showOverlay('Loading...','Trying to load ' + url + '. If the site blocks embedding you will be able to open it in a new tab.', false);
+        // set srcdoc minimal to reduce weird flashes then set src
+        iframe.srcdoc = '<div style="font-family:Inter,system-ui;color:#0b0b0f;padding:40px;text-align:center"><h3>Loading...</h3><p class="tiny">'+url+'</p></div>';
+        // small delay to allow the srcdoc UI to render
+        setTimeout(()=>{ iframe.src = url; }, 120);
+      });
+    });
+
+    // Called when iframe fires load. We try to detect if the site blocked embedding.
+    iframe.addEventListener('load', ()=>{
+      // If no currentURL, it's the default srcdoc — hide overlay
+      if(!currentURL){ hideOverlay(); return; }
+
+      // First try: if same-origin, we can inspect content
+      try{
+        const doc = iframe.contentDocument; // will throw on cross-origin
+        // If we can access the doc, the site allowed embedding
+        hideOverlay();
+      }catch(e){
+        // Cross-origin: site probably loaded but we can't access it. Still may be blocked by X-Frame-Options.
+        // To detect blocking, we try to read the iframe's URL — if it's 'about:blank', it failed.
+        try{
+          const loc = iframe.contentWindow.location.href;
+          // if this succeeds and is not about:blank, probably loaded but cross-origin
+          // still hide overlay (site is visible even if cross-origin)
+          if(loc && loc !== 'about:blank'){
+            hideOverlay();
+          }else{
+            showOverlay('Blocked','This site refused to connect inside an iframe. Click "Open in new tab" to visit it directly.', true);
+            openLink.href = currentURL; openLink.target = '_blank';
+          }
+        }catch(err){
+          // If accessing contentWindow.location throws, the browser prevented access OR site blocked.
+          // We'll assume blocked if the iframe's src equals the URL but visibility might be empty.
+          showOverlay('Blocked','This site refused to connect inside an iframe. Click "Open in new tab" to visit it directly.', true);
+          openLink.href = currentURL; openLink.target = '_blank';
+        }
+      }
+    });
+
+    // If user wants to open current URL in new tab
+    openNew.addEventListener('click', ()=>{
+      if(currentURL) window.open(currentURL, '_blank', 'noopener');
+      else window.open('about:blank','_blank');
+    });
+
+    // timeout fail-safe for blocked iframes
+    let loadTimer = null;
+
+    function startLoadFailSafe(){
+      if(loadTimer) clearTimeout(loadTimer);
+      loadTimer = setTimeout(()=>{
+        if(currentURL){
+          showOverlay('Blocked','This site refused to connect inside an iframe. Click "Open in new tab" to visit it directly.', true);
+          openLink.href = currentURL;
+          openLink.target = '_blank';
+        }
+      }, 1800);
+    }
+
+    // modify button clicks to start timer
+    buttons.forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        const url = btn.getAttribute('data-url');
+        currentURL = url;
+        showOverlay('Loading...','Trying to load ' + url + '. If the site blocks embedding you will be able to open it in a new tab.', false);
+        iframe.srcdoc = '<div style="font-family:Inter,system-ui;color:#0b0b0f;padding:40px;text-align:center"><h3>Loading...</h3><p class="tiny">'+url+'</p></div>';
+        setTimeout(()=>{ iframe.src = url; }, 120);
+        startLoadFailSafe();
+      });
+    });
+
+    // initial state
+    showOverlay('No site loaded','Click a button above to load a site into the PaperOS viewer.', false);
+  </script>
+</body>
+</html>
